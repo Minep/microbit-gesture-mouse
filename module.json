@@ -1,0 +1,13 @@
+{
+  "name": "gesture-mouse",
+  "version": "2.1.1",
+  "description": "A mouse that use gesture to control. Based on Microbit",
+  "license": "MIT",
+  "dependencies": {
+    "microbit": "lancaster-university/microbit#v2.1.1",
+    "mdl-gmouse": "~1.0.0"
+  },
+  "targetDependencies": {},
+  "extraIncludes":["includes"],
+  "bin": "./source"
+}

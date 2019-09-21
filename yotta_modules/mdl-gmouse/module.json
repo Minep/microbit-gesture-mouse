@@ -1,0 +1,15 @@
+{
+  "name": "mdl-gmouse",
+  "version": "1.0.0",
+  "description": "GestureMouse module",
+  "license": "MIT",
+  "dependencies": {
+    "microbit": "lancaster-university/microbit#v2.1.1"
+  },
+  "extraIncludes": [
+    "inc"
+  ],
+  "targetDependencies": {},
+  "keywords": [],
+  "author": "Lunaixsky"
+}
