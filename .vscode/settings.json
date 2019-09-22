@@ -42,7 +42,7 @@
         "streambuf": "cpp",
         "typeinfo": "cpp"
     },
-    "editor.fontFamily": "'Consolas'",
+    "editor.fontFamily": "'Consolas','Segoe UI'",
     "editor.fontWeight": "500", // Regular
     "editor.fontLigatures": true,
     "editor.letterSpacing": 0.15

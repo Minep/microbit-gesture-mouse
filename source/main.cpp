@@ -4,12 +4,12 @@
 #include "mdl_wire.h"
 #include "lib_images.h"
 
-#define UPDATE_PRE_SECONDS 8
-#define SCROLL_THERSHOLD 30
+#define UPDATE_PRE_SECONDS 16
+#define SCROLL_THERSHOLD 20
 #define SCROLL_UPPER_LIM 90
 #define SCROLL_RATIO 0.6
 #define SCROLL_BASEVAL 20
-#define TILTED_THERSHOLD 30
+#define TILTED_THERSHOLD 20
 #define TILTED_UPPER_LIM 90
 #define MOUSE_THRESHOLD 10
 
@@ -41,7 +41,7 @@ void OnScrollAction(int dy)
                 SCROLL_UPPER_LIM - SCROLL_THERSHOLD,
                 -5,
                 5,
-                dy - SCROLL_BASEVAL * (dy < 0 ? -1 : 1)
+                dy - SCROLL_BASEVAL * (dy < 0 ? -1 : 1) * 0.2
             );
 
             mdlWire->enqueue(mdlWire->createPacket(MDL_ONPITCH,rest,0));
@@ -84,7 +84,7 @@ void OnTilted(int dx)
                 -TILTED_UPPER_LIM+TILTED_THERSHOLD,
                 TILTED_UPPER_LIM-TILTED_THERSHOLD,
                 -5,
-                5,dx - TILTED_THERSHOLD * (dx < 0 ? -1 : 1));
+                5,dx - TILTED_THERSHOLD * (dx < 0 ? -1 : 1) * 0.2);
             mdlWire->enqueue(mdlWire->createPacket(MDL_ONROLL,rest,0));
             isTiltedTakePlace = true;
             if(rest<0){
