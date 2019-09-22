@@ -14,8 +14,8 @@
 typedef struct MDL_MOUSE_PACKET
 {
     uint8_t command;  
-    int8_t signed value1;
-    int8_t signed value2;
+    int8_t value1;
+    int8_t value2;
 } mdl_mouse_packet;
 typedef struct MDL_VECTOR
 {
@@ -37,7 +37,7 @@ class MdlWire{
         void Send(uint8_t* packet);
         void setConnected(bool connect);
         bool getConnected();
-        mdl_mouse_packet* createPacket(uint8_t cmd,int val1,int val2);
+        mdl_mouse_packet* createPacket(uint8_t cmd,int8_t val1,int8_t val2);
     private:
         std::queue<uint8_t*> queue;
         MicroBit* bit;

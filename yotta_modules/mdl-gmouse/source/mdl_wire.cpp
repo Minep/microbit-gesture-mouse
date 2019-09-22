@@ -35,7 +35,7 @@ void MdlWire::SendAll()
     }
 }
 
-mdl_mouse_packet* MdlWire::createPacket(uint8_t cmd,int val1,int val2)
+mdl_mouse_packet* MdlWire::createPacket(uint8_t cmd,int8_t val1,int8_t val2)
 {
     mdl_mouse_packet* packet = (mdl_mouse_packet*)calloc(1,MDL_PACKET_LEN);
     packet->command = cmd;

@@ -4,7 +4,7 @@
 #include "mdl_wire.h"
 #include "lib_images.h"
 
-#define UPDATE_PRE_SECONDS 16
+#define UPDATE_PRE_SECONDS 8
 #define SCROLL_THERSHOLD 30
 #define SCROLL_UPPER_LIM 90
 #define SCROLL_RATIO 0.6
@@ -24,12 +24,21 @@ mdl_vector* direction;
 bool isTiltedTakePlace = false;
 bool isScrollTakePlace = false;
 
+bool signleUseFlag = false;
+
 
 void OnScrollAction(int dy)
 {
     //mbit.serial.printf("Scrolled:%d\r\n",dy);
     if(abs(dy)>=SCROLL_THERSHOLD && abs(dy)<=SCROLL_UPPER_LIM && !isTiltedTakePlace){
-        int rest = dy - SCROLL_BASEVAL * (dy < 0 ? -1 : 1);
+        int rest = controllerGesture->map(
+            -SCROLL_UPPER_LIM + SCROLL_THERSHOLD,
+            SCROLL_UPPER_LIM - SCROLL_THERSHOLD,
+            -5,
+            5,
+            dy - SCROLL_BASEVAL * (dy < 0 ? -1 : 1)
+        );
+
         mdlWire->enqueue(mdlWire->createPacket(MDL_ONPITCH,rest,0));
         isScrollTakePlace = true;
         if(rest<0){
@@ -38,10 +47,12 @@ void OnScrollAction(int dy)
         else{
             mbit.display.print(down);
         }
+        signleUseFlag=false;
     }
     else if(isScrollTakePlace)
     {
         isScrollTakePlace =false;
+        signleUseFlag=true;
         if(!(mbit.display.image == img))
         {
             mbit.display.print(img);
@@ -52,7 +63,11 @@ void OnScrollAction(int dy)
 void OnTilted(int dx)
 {
     if(abs(dx)>=TILTED_THERSHOLD && abs(dx)<=TILTED_UPPER_LIM && !isScrollTakePlace){
-        int rest = dx - TILTED_THERSHOLD * (dx < 0 ? -1 : 1);
+        int rest = controllerGesture->map(
+            -TILTED_UPPER_LIM+TILTED_THERSHOLD,
+            TILTED_UPPER_LIM-TILTED_THERSHOLD,
+            -5,
+            5,dx - TILTED_THERSHOLD * (dx < 0 ? -1 : 1));
         mdlWire->enqueue(mdlWire->createPacket(MDL_ONROLL,rest,0));
         isTiltedTakePlace = true;
         if(rest<0){
@@ -61,10 +76,12 @@ void OnTilted(int dx)
         else{
             mbit.display.print(left);
         }
+        signleUseFlag=false;
     }
     else if(isTiltedTakePlace)
     {
         isTiltedTakePlace=false;
+        signleUseFlag=true;
         if(!(mbit.display.image == img))
         {
             mbit.display.print(img);
@@ -120,8 +137,14 @@ void loop()
 {
     if(controllerGesture->getModes()==MDL_G_MULT_MOUSE)
     {
-        OnScrollAction(mbit.accelerometer.getPitch());
-        OnTilted(mbit.accelerometer.getRoll());
+        if(controllerGesture->getLeftButtonStatus() == PRESSED)
+        {
+            if(signleUseFlag)
+            {
+                OnScrollAction(mbit.accelerometer.getPitch());
+                OnTilted(mbit.accelerometer.getRoll());
+            }
+        }
     }
     else if(controllerGesture->getModes() == MDL_G_MOUSE)
     {
