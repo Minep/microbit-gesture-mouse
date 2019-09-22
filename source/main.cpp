@@ -24,35 +24,49 @@ mdl_vector* direction;
 bool isTiltedTakePlace = false;
 bool isScrollTakePlace = false;
 
-bool signleUseFlag = false;
+bool singleUseFlag = true;
 
 
 void OnScrollAction(int dy)
 {
-    //mbit.serial.printf("Scrolled:%d\r\n",dy);
-    if(abs(dy)>=SCROLL_THERSHOLD && abs(dy)<=SCROLL_UPPER_LIM && !isTiltedTakePlace){
-        int rest = controllerGesture->map(
-            -SCROLL_UPPER_LIM + SCROLL_THERSHOLD,
-            SCROLL_UPPER_LIM - SCROLL_THERSHOLD,
-            -5,
-            5,
-            dy - SCROLL_BASEVAL * (dy < 0 ? -1 : 1)
-        );
+    if(abs(dy)>SCROLL_UPPER_LIM)
+    {
+        return;
+    }
+    if(!isTiltedTakePlace){
+        if(abs(dy)>=SCROLL_THERSHOLD )
+        {
+            int rest = controllerGesture->map(
+                -SCROLL_UPPER_LIM + SCROLL_THERSHOLD,
+                SCROLL_UPPER_LIM - SCROLL_THERSHOLD,
+                -5,
+                5,
+                dy - SCROLL_BASEVAL * (dy < 0 ? -1 : 1)
+            );
 
-        mdlWire->enqueue(mdlWire->createPacket(MDL_ONPITCH,rest,0));
-        isScrollTakePlace = true;
-        if(rest<0){
-            mbit.display.print(up);
+            mdlWire->enqueue(mdlWire->createPacket(MDL_ONPITCH,rest,0));
+            isScrollTakePlace = true;
+            if(rest<0){
+                mbit.display.print(up);
+            }
+            else{
+                mbit.display.print(down);
+            }
+            singleUseFlag=false;
         }
-        else{
-            mbit.display.print(down);
-        }
-        signleUseFlag=false;
+        else
+        {
+            singleUseFlag=true;
+            isScrollTakePlace = false;
+            if(!(mbit.display.image == img))
+            {
+                mbit.display.print(img);
+            }
+        }    
     }
     else if(isScrollTakePlace)
     {
         isScrollTakePlace =false;
-        signleUseFlag=true;
         if(!(mbit.display.image == img))
         {
             mbit.display.print(img);
@@ -62,26 +76,38 @@ void OnScrollAction(int dy)
 
 void OnTilted(int dx)
 {
-    if(abs(dx)>=TILTED_THERSHOLD && abs(dx)<=TILTED_UPPER_LIM && !isScrollTakePlace){
-        int rest = controllerGesture->map(
-            -TILTED_UPPER_LIM+TILTED_THERSHOLD,
-            TILTED_UPPER_LIM-TILTED_THERSHOLD,
-            -5,
-            5,dx - TILTED_THERSHOLD * (dx < 0 ? -1 : 1));
-        mdlWire->enqueue(mdlWire->createPacket(MDL_ONROLL,rest,0));
-        isTiltedTakePlace = true;
-        if(rest<0){
-            mbit.display.print(right);
+    if(abs(dx)>TILTED_UPPER_LIM) return;
+    if(!isScrollTakePlace){
+        if(abs(dx)>=TILTED_THERSHOLD)
+        {
+            int rest = controllerGesture->map(
+                -TILTED_UPPER_LIM+TILTED_THERSHOLD,
+                TILTED_UPPER_LIM-TILTED_THERSHOLD,
+                -5,
+                5,dx - TILTED_THERSHOLD * (dx < 0 ? -1 : 1));
+            mdlWire->enqueue(mdlWire->createPacket(MDL_ONROLL,rest,0));
+            isTiltedTakePlace = true;
+            if(rest<0){
+                mbit.display.print(right);
+            }
+            else{
+                mbit.display.print(left);
+            }
+            singleUseFlag=false;
         }
-        else{
-            mbit.display.print(left);
+        else
+        {
+            singleUseFlag=true;
+            isTiltedTakePlace = false;
+            if(!(mbit.display.image == img))
+            {
+                mbit.display.print(img);
+            }
         }
-        signleUseFlag=false;
     }
     else if(isTiltedTakePlace)
     {
         isTiltedTakePlace=false;
-        signleUseFlag=true;
         if(!(mbit.display.image == img))
         {
             mbit.display.print(img);
@@ -121,7 +147,17 @@ void onModeChanged(uint8_t modes)
 void OnButtonAEvent(BUTTON_STATUS status)
 {
     //mbit.serial.printf("Status changed: %u\r\n",status);
-    mdlWire->enqueue(mdlWire->createPacket(MDL_WIN_BTN_CHANGED,status,0));
+    switch (controllerGesture->getModes())
+    {
+        case MDL_G_MULT_MOUSE:
+            mdlWire->enqueue(mdlWire->createPacket(MDL_WIN_BTN_CHANGED,status,0));
+            break;
+        case MDL_G_MOUSE:
+            mdlWire->enqueue(mdlWire->createPacket(MDL_MOUSE_L_BTN_CHANGED,status,0));
+            break;
+        default:
+            break;
+    }
     if(status == PRESSED)
     {
         mbit.display.print(win);
@@ -130,7 +166,6 @@ void OnButtonAEvent(BUTTON_STATUS status)
     {
         mbit.display.print(img);
     }
-    
 }
 
 void loop()
@@ -139,12 +174,18 @@ void loop()
     {
         if(controllerGesture->getLeftButtonStatus() == PRESSED)
         {
-            if(signleUseFlag)
+            if(singleUseFlag)
             {
                 OnScrollAction(mbit.accelerometer.getPitch());
                 OnTilted(mbit.accelerometer.getRoll());
             }
         }
+        else
+        {
+            OnScrollAction(mbit.accelerometer.getPitch());
+            OnTilted(mbit.accelerometer.getRoll());
+        }
+        
     }
     else if(controllerGesture->getModes() == MDL_G_MOUSE)
     {

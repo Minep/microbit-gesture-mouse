@@ -8,6 +8,8 @@
 #define MDL_ONROLL 0x03
 #define MDL_ONPITCH 0x04
 #define MDL_ONMOUSEMOVE 0x05
+#define MDL_MOUSE_L_BTN_CHANGED 0xf1
+
 
 #pragma pack(push,1)
 

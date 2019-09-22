@@ -12,8 +12,8 @@ void ControllerGesture::OnButtonClicked(MicroBitEvent bitEvent)
     {
         case MICROBIT_BUTTON_EVT_DOWN:
             if(buttonID == MICROBIT_ID_BUTTON_A){
-                win_btn = PRESSED;
-                handlers->onBtnAEvent(win_btn);
+                mouse_L_btn = PRESSED;
+                handlers->onBtnAEvent(mouse_L_btn);
             }
             else if(buttonID == MICROBIT_ID_BUTTON_AB){
                 lrbtn = PRESSED;
@@ -21,8 +21,8 @@ void ControllerGesture::OnButtonClicked(MicroBitEvent bitEvent)
             break;
         case MICROBIT_BUTTON_EVT_UP:
             if(buttonID == MICROBIT_ID_BUTTON_A){
-                win_btn = RELEASED;
-                handlers->onBtnAEvent(win_btn);
+                mouse_L_btn = RELEASED;
+                handlers->onBtnAEvent(mouse_L_btn);
             }
             else if(buttonID == MICROBIT_ID_BUTTON_AB){
                 lrbtn = RELEASED;
@@ -53,6 +53,11 @@ void ControllerGesture::OnAccmeterUpdate(MicroBitEvent bitevent)
     if(bitevent.source == MICROBIT_ACCELEROMETER_EVT_DATA_UPDATE){
         //double dy = map(-90,90,0,240,accr);
     }
+}
+
+BUTTON_STATUS ControllerGesture::getLeftButtonStatus()
+{
+    return mouse_L_btn;
 }
 
 uint8_t ControllerGesture::getModes()

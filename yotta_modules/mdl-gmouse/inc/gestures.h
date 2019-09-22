@@ -9,15 +9,13 @@ class ControllerGesture{
         void OnButtonClicked(MicroBitEvent bitevent);
         int map(int fromLow, int fromHigh, int toLow, int toHigh, int value);
         uint8_t getModes();
-        BUTTON_STATUS getWinButtonStatus();
+        BUTTON_STATUS getLeftButtonStatus();
         BUTTON_STATUS getModeButtonStatus();
 
         // Mouse mode only
-
-        BUTTON_STATUS getLeftButtonStatus();
         BUTTON_STATUS getRightButtonStatus();
     private:
-        BUTTON_STATUS win_btn;
+        BUTTON_STATUS mouse_L_btn;
         BUTTON_STATUS lrbtn;
         GESTURE_HANDLERS* handlers;
         uint8_t modes = MDL_G_MULT_MOUSE;
